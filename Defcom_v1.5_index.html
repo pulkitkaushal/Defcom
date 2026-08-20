@@ -1,0 +1,599 @@
+<!doctype html>
+
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Defcom — Bug Fix Decision Tool</title>
+<style>
+:root{--ink:#111827;--muted:#667085;--bg:#f4f5f8;--card:#fff;--line:#e4e7ec;--purple:#5b2ca0;--purple2:#7b4bc0;--soft:#f4effa;--green:#17745a;--greenS:#e8f5f0;--amber:#a15c00;--amberS:#fff3df;--red:#a92d31;--redS:#fdecec}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;background:var(--bg);color:var(--ink)}button,input,select,textarea{font:inherit}
+.bar{position:sticky;top:0;z-index:20;background:#fff;border-bottom:1px solid var(--line)}.barin,.wrap{max-width:1040px;margin:auto}.barin{padding:14px 20px;display:flex;justify-content:space-between;align-items:center}.brand{display:flex;gap:11px;align-items:center}.mark{width:36px;height:36px;border-radius:11px;background:linear-gradient(145deg,var(--purple),var(--purple2))}.brand b{font-size:15px}.brand small{display:block;color:var(--muted);margin-top:2px}.wrap{padding:28px 20px 60px}.hero h1{margin:0;font-size:30px}.hero p{color:var(--muted);font-size:14px;max-width:780px;line-height:1.5}
+.card{background:#fff;border:1px solid var(--line);border-radius:20px;padding:21px;margin-top:14px}.tabs{display:flex;gap:8px}.btn{border:1px solid var(--line);border-radius:999px;height:43px;padding:0 17px;background:#fff;font-weight:800;font-size:12px;cursor:pointer}.primary{background:linear-gradient(135deg,var(--purple),var(--purple2));color:#fff;border:0}.hidden{display:none!important}
+h2{font-size:18px;margin:0 0 4px}.sub{font-size:12px;color:var(--muted);margin-bottom:17px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}.field label{display:block;font-size:12px;font-weight:800;color:#344054;margin-bottom:7px}.req{color:var(--red)}input,select,textarea{width:100%;border:1px solid #d0d5dd;border-radius:13px;background:#fff;padding:0 13px;outline:none}input,select{height:48px}textarea{min-height:95px;padding:12px;resize:vertical}input:focus,select:focus,textarea:focus{border-color:#8f6bc1;box-shadow:0 0 0 4px rgba(91,44,160,.09)}.error input,.error select,.error textarea{border-color:var(--red)}
+.footerrow{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-top:14px}.micro{font-size:11px;color:var(--muted);max-width:650px}.actions{display:flex;gap:8px}
+.result{padding:0;overflow:hidden}.resulthead{padding:24px;background:linear-gradient(180deg,#fff,#fbf9fe);border-bottom:1px solid var(--line)}.eyebrow{text-transform:uppercase;letter-spacing:.12em;font-size:10px;font-weight:900;color:var(--muted)}.decisionline{display:flex;justify-content:space-between;align-items:end;gap:12px}.decisionline h2{font-size:34px;margin-top:6px}.bug{font-size:12px;font-weight:850;color:#475467}.rec{font-size:13px;color:#475467;margin-top:6px}
+.metrics{display:grid;grid-template-columns:1fr 1fr;border-bottom:1px solid var(--line)}.metric{padding:18px 22px}.metric+.metric{border-left:1px solid var(--line)}.metric small{display:block;text-transform:uppercase;color:var(--muted);font-weight:800}.metric strong{font-size:26px}.pill,.chip{display:inline-block;border-radius:999px;padding:5px 8px;font-size:10px;font-weight:900;background:var(--soft);color:var(--purple);margin-left:6px}.bodypad{padding:22px}.why{background:#f8f7fb;border-radius:14px;padding:14px;font-size:11px;color:#525866}.why b{font-size:12px}.why ul{margin:8px 0 0;padding-left:18px;line-height:1.55}
+.overridebox{border:1px solid #e8def5;background:#fcfaff;border-radius:16px;padding:18px;margin-top:14px}.q{display:grid;grid-template-columns:1fr 150px;gap:12px;align-items:center;padding:12px 0;border-top:1px solid var(--line)}.q:first-of-type{border-top:0}.q label{font-size:12px;font-weight:750}.override-summary{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:14px 0}.summarybox{border:1px solid var(--line);border-radius:13px;padding:12px}.summarybox small{display:block;color:var(--muted);font-size:9px;text-transform:uppercase;font-weight:850}.summarybox b{font-size:14px}
+.answer-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:8px}.answer-item{background:#fff;border:1px solid var(--line);border-radius:10px;padding:9px 11px}.answer-item small{display:block;color:var(--muted);font-size:9px;text-transform:uppercase;font-weight:850;margin-bottom:3px}.answer-item span{font-size:12px;font-weight:700}.detail-toggle{margin-top:10px;border:0;background:transparent;color:var(--purple);font-weight:800;font-size:11px;cursor:pointer;padding:4px 0}.detail-panel{margin-top:8px}
+.history table{width:100%;border-collapse:collapse;font-size:11px}.history th,.history td{padding:10px;border-bottom:1px solid var(--line);text-align:left}.history th{background:#f8f7fb;color:var(--muted);font-size:9px;text-transform:uppercase}.tablewrap{overflow:auto;border:1px solid var(--line);border-radius:14px}.now{background:var(--redS);color:var(--red)}.soon{background:var(--amberS);color:var(--amber)}.later{background:var(--greenS);color:var(--green)}.esc{background:var(--soft);color:var(--purple)}.foot{text-align:center;font-size:10px;color:#8a90a0;margin-top:18px}
+@media(max-width:720px){.metrics[style]{grid-template-columns:1fr!important}.wrap{padding:22px 14px 45px}.grid,.metrics,.override-summary,.answer-grid{grid-template-columns:1fr}.metric+.metric{border-left:0;border-top:1px solid var(--line)}.q{grid-template-columns:1fr}.footerrow{align-items:stretch;flex-direction:column}.actions .btn{flex:1}.decisionline{align-items:start;flex-direction:column}}.help-overlay{position:fixed;inset:0;z-index:50;background:rgba(17,24,39,.5);display:flex;align-items:center;justify-content:center;padding:20px}.help-modal{background:#fff;border-radius:20px;max-width:760px;width:100%;max-height:86vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 20px 60px rgba(0,0,0,.25)}.help-head{display:flex;justify-content:space-between;align-items:center;gap:12px;padding:16px 18px;border-bottom:1px solid var(--line)}.help-body{padding:20px;overflow-y:auto}.help-body h3{font-size:14px;margin:18px 0 8px}.help-body h3:first-child{margin-top:0}.help-body table{width:100%;border-collapse:collapse;font-size:12px;margin:6px 0 4px}.help-body th,.help-body td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:left}.help-body th{background:#f8f7fb;color:var(--muted);font-size:10px;text-transform:uppercase}
+@media(max-width:720px){.help-head{flex-wrap:wrap}.help-head .tabs{order:2;width:100%}}
+</style></head>
+<body>
+<header class="bar"><div class="barin"><div class="brand"><div class="mark"></div><div><b>Defcom <span style="color:#7b4bc0">v1.5</span></b><small>Pre-DHB + Post-DHB decision support</small></div></div><button class="btn" type="button" onclick="openHelp()" style="width:38px;height:38px;border-radius:50%;padding:0;font-size:14px" aria-label="Scoring reference">?</button></div></header>
+
+<div id="helpOverlay" class="help-overlay hidden" onclick="if(event.target===this)closeHelp()">
+  <div class="help-modal">
+    <div class="help-head">
+      <div class="tabs">
+        <button class="btn primary" id="helpTabPre" type="button" onclick="setHelpTab('pre')">Pre-DHB scoring</button>
+        <button class="btn" id="helpTabPost" type="button" onclick="setHelpTab('post')">Post-DHB scoring</button>
+      </div>
+      <button class="btn" type="button" onclick="closeHelp()" aria-label="Close">Close</button>
+    </div>
+    <div class="help-body" id="helpBody"></div>
+  </div>
+</div>
+
+<main class="wrap">
+<section class="hero"><h1>Bug disposition, from triage to DHB.</h1><p>Use Pre-DHB to determine whether a defect can be safely fixed within the current release or should be taken to DHB. Use Post-DHB for Issue Impact × Change Risk disposition and controlled decision override.</p></section>
+
+<section class="card">
+  <div class="tabs">
+    <a id="preTab" class="btn primary" href="#preSection" onclick="setPhase('pre');return false" style="display:inline-flex;align-items:center;text-decoration:none">Pre-DHB</a>
+    <a id="postTab" class="btn" href="#postSection" onclick="setPhase('post');return false" style="display:inline-flex;align-items:center;text-decoration:none">Post-DHB</a>
+  </div>
+</section>
+
+<section id="preSection">
+  <section class="card">
+    <div class="field"><label>Bug ID <span class="req">*</span></label><input id="preId" placeholder="e.g., DHPS-46762"></div>
+  </section>
+  <section class="card"><h2>Defect Context</h2><div class="sub">What is the consequence of carrying this defect in the release?</div><div class="grid" id="preImpactGrid"></div></section>
+  <section class="card"><h2>Fix Readiness & Release Feasibility</h2><div class="sub">Is the fix understood, sufficiently safe, verifiable, and absorbable within the current release?</div><div class="grid" id="preFeasGrid"></div></section>
+
+
+<div class="footerrow"><div class="micro">Pre-DHB is a decision gate, not a prioritization score.</div><div class="actions"><button class="btn" type="button" onclick="resetPre()">Clear</button><button id="preEvaluateBtn" class="btn primary" type="button">Evaluate</button></div></div>
+</section>
+<section id="preResult" class="card result hidden"></section>
+
+<section id="postSection" class="hidden">
+  <section id="postForm">
+    <section class="card"><div class="field"><label>Bug ID <span class="req">*</span></label><input id="bugId" placeholder="e.g., DHPS-46762"></div><div id="bugLookup" class="micro" style="margin-top:8px"></div>
+<div class="field" style="margin-top:14px"><label>DHB Disposition <span class="req">*</span></label><select id="dhbDisposition"><option value="">Select</option><option value="Deferred / acceptable to carry">Deferred / acceptable to carry</option></select><div class="micro" style="margin-top:7px;line-height:1.45">Post-DHB is only for defects DHB has determined can be deferred. Must-fix issues do not continue into this workflow.</div></div></section>
+    <section class="card"><h2>Issue Impact</h2><div class="sub">How significantly does this defect affect customers, safety, compliance, or expected use?</div><div class="grid" id="impactGrid"></div></section>
+    <section class="card"><h2>Change Risk</h2><div class="sub">How much risk or disruption would introducing the fix create for the release?</div><div class="grid" id="riskGrid"></div></section>
+    <div class="footerrow"><div class="micro">Scoring remains hidden until Evaluate.</div><div class="actions"><button class="btn" type="button" onclick="resetPost()">Clear</button><button class="btn primary" type="button" onclick="evaluatePost()">Evaluate</button></div></div>
+  </section>
+  <section id="postResult" class="card result hidden"></section>
+  <section id="overridePanel" class="card hidden"></section>
+  <section class="card history"><h2>Post-DHB Assessment History</h2><div class="sub">One row per bug. Tool recommendation and final POPM disposition are retained separately; every override is logged.</div><div class="tablewrap"><div id="hist"></div></div></section>
+</section>
+
+<div class="foot">Decision-support tool. Final disposition remains subject to applicable governance.</div>
+</main>
+
+<script>
+const $=id=>document.getElementById(id);
+const HKEY='defcomBugRecordsV5';
+
+function normId(id){return String(id||'').trim().toUpperCase()}
+function getHistory(){try{return JSON.parse(localStorage.getItem(HKEY)||'[]')}catch{return[]}}
+function saveHistory(h){localStorage.setItem(HKEY,JSON.stringify(h.slice(0,300)))}
+function findBug(bugId){return getHistory().find(r=>r.bugId===normId(bugId))}
+function upsertBug(rec){
+ const h=getHistory();
+ const i=h.findIndex(r=>r.bugId===rec.bugId);
+ if(i>=0)h[i]=rec;else h.unshift(rec);
+ saveHistory(h);
+}
+
+const PRE_IMPACT=[
+ {id:'preSeverity',name:'Severity',opts:['Critical','High','Medium','Low']},
+ {id:'preCustomer',name:'Customer Impact',opts:['Blocking','Significant','Minor','None']},
+ {id:'preSafety',name:'Known Safety Concern?',help:'Has a safety impact been identified, or is a credible safety concern currently under assessment?',opts:['Confirmed','Potential — assessment required / in progress','No known concern']},
+ {id:'preRegulatory',name:'Known Regulatory / Compliance Concern?',help:'Has a regulatory/compliance impact been identified, or is a credible compliance concern currently under assessment?',opts:['Confirmed','Potential — assessment required / in progress','No known concern']},
+ {id:'preWorkaround',name:'Workaround',opts:['None','Partial / difficult','Available']},
+ {id:'preOccurrence',name:'Occurrence / Exposure',opts:['Common','Occasional','Rare']}
+];
+
+const PRE_FEAS=[
+ {id:'preRoot',name:'Is the root cause understood?',opts:['Yes','Partially','No']},
+ {id:'preFix',name:'Is a fix identified?',opts:['Yes','Partially','No']},
+ {id:'preConfidence',name:'Confidence in the proposed fix',opts:['High','Medium','Low']},
+ {id:'preEffort',name:'Level of Effort',opts:['Small','Medium','Large']},
+ {id:'preRegression',name:'Regression Risk',opts:['Low','Medium','High']},
+ {id:'preVerification',name:'Verification Complexity',opts:['Simple','Moderate','Complex']},
+ {id:'preTimeline',name:'Impact to Release Timeline',opts:['None','Manageable','Significant']},
+ {id:'prePhase',name:'Release Phase',opts:['Dev Ready (Documentation)','Development','Dry Run','Design Validation (Release Candidate Validation)']}
+];
+
+const POST_IMPACT=[
+ {id:'severity',name:'Severity',opts:[['Critical',10],['High',7],['Medium',3],['Low',1]]},
+ {id:'customer',name:'Customer Impact',opts:[['Blocking',8],['Significant',5],['Minor',2],['None',0]]},
+ {id:'safety',name:'Known Safety Concern?',help:'Has a safety impact been identified, or is a credible safety concern currently under assessment?',opts:[['Confirmed','X'],['Potential — assessment required / in progress',6],['No known concern',0]]},
+ {id:'regulatory',name:'Known Regulatory / Compliance Concern?',help:'Has a regulatory/compliance impact been identified, or is a credible compliance concern currently under assessment?',opts:[['Confirmed','X'],['Potential — assessment required / in progress',5],['No known concern',0]]},
+ {id:'workaround',name:'Workaround',opts:[['None',6],['Partial / difficult',3],['Available',0]]},
+ {id:'occurrence',name:'Occurrence / Exposure',opts:[['Common',5],['Occasional',3],['Rare',1]]}
+];
+
+const POST_RISK=[
+ {id:'effort',name:'Level of Effort',opts:[['Small',1],['Medium',2],['Large',3]]},
+ {id:'regression',name:'Regression Risk',opts:[['Low',1],['Medium',2],['High',3]]},
+ {id:'timeline',name:'Impact to Release Timeline',opts:[['Low',1],['Medium',2],['High',3]]},
+ {id:'releasePhase',name:'Release Phase',opts:[['Dev Ready (Documentation)',0],['Development',1],['Dry Run',2],['Design Validation (Release Candidate Validation)',3]]}
+];
+
+function buildPre(){
+ const make=x=>`<div class="field"><label>${x.name} <span class="req">*</span></label>${x.help?`<div class="micro" style="margin:-2px 0 7px;line-height:1.4">${e(x.help)}</div>`:''}<select id="${x.id}"><option value="">Select</option>${x.opts.map(o=>`<option>${o}</option>`).join('')}</select></div>`;
+ $('preImpactGrid').innerHTML=PRE_IMPACT.map(make).join('');
+ $('preFeasGrid').innerHTML=PRE_FEAS.map(make).join('');
+}
+
+function buildPost(){
+ const make=x=>`<div class="field"><label>${x.name} <span class="req">*</span></label>${x.help?`<div class="micro" style="margin:-2px 0 7px;line-height:1.4">${e(x.help)}</div>`:''}<select id="${x.id}"><option value="">Select</option>${x.opts.map(o=>`<option value="${o[1]}">${o[0]}</option>`).join('')}</select></div>`;
+ $('impactGrid').innerHTML=POST_IMPACT.map(make).join('');
+ $('riskGrid').innerHTML=POST_RISK.map(make).join('');
+}
+
+function helpPreHtml(){
+ const criteriaRows=(list)=>list.map(x=>`<tr><td><b>${e(x.name)}</b></td><td>${x.opts.map(e).join(' / ')}</td></tr>`).join('');
+ return `
+ <p>Pre-DHB answers one operational question: <b>Can this defect be appropriately fixed within the current release, or is there a disposition dilemma that requires DHB?</b></p>
+ <p class="micro">There are only two recommendations: <b>FIX WITHIN RELEASE</b> and <b>TAKE TO DHB</b>.</p>
+
+ <h3>Issue Impact</h3>
+ <div style="overflow-x:auto"><table><thead><tr><th>Criterion</th><th>Options</th></tr></thead><tbody>${criteriaRows(PRE_IMPACT)}</tbody></table></div>
+ <p class="micro">Safety and Regulatory/Compliance are strong governance signals. A credible or confirmed concern increases the importance of resolving the issue, but does not create a separate Pre-DHB disposition. If the fix is ready and the release can absorb it, the recommendation can still be <b>FIX WITHIN RELEASE</b>.</p>
+
+ <h3>Fix Readiness & Release Fit</h3>
+ <div style="overflow-x:auto"><table><thead><tr><th>Criterion</th><th>Options</th></tr></thead><tbody>${criteriaRows(PRE_FEAS)}</tbody></table></div>
+ <p class="micro"><b>Fix Readiness</b> reflects root-cause understanding, fix identification, confidence, regression risk, and verification complexity. <b>Release Fit</b> reflects effort, timeline impact, and release phase.</p>
+
+ <h3>Governance flow</h3>
+ <p class="micro">If the issue should be fixed and the change can be confidently absorbed, Defcom recommends <b>FIX WITHIN RELEASE</b>. When there is a meaningful disposition dilemma because fix readiness or release constraints make routine execution uncertain, Defcom recommends <b>TAKE TO DHB</b>.</p>
+ <p class="micro">For a high-concern issue with significant release risk, Defcom may also flag: <b>Potential ELT escalation if DHB determines the issue must be fixed.</b> DHB still occurs first. ELT would address the resulting release/timeline risk, not re-decide the defect disposition.</p>
+
+ <h3>What happens after DHB?</h3>
+ <p class="micro">If DHB determines the issue <b>must be fixed</b>, it is fixed and does not enter Post-DHB. If the resulting release impact requires leadership acceptance, it may proceed to ELT. If DHB determines the issue <b>can be deferred</b>, it may then enter Defcom Post-DHB.</p>`;
+}
+
+function helpPostHtml(){
+ const criteriaRows=(list)=>list.map(x=>`<tr><td><b>${e(x.name)}</b></td><td>${x.opts.map(o=>e(o[0])+' — '+(o[1]==='X'?'bypasses scoring, forces escalation':o[1]+(o[1]===1?' pt':' pts'))).join('<br>')}</td></tr>`).join('');
+ return `
+ <p>Post-DHB is only for defects that <b>DHB has determined can be deferred / are acceptable to carry</b>. It evaluates <b>Issue Impact</b> and <b>Change Risk</b> to generate a disposition recommendation. These fields carry governance weight beyond ordinary scoring. A <b>Confirmed</b> concern bypasses scoring and forces <b>ESCALATE</b>. A <b>Potential — assessment required / in progress</b> concern materially raises Issue Impact. Potential means a credible identified concern, not general uncertainty.</p>
+
+ <h3>Issue Impact scoring (max 40)</h3>
+ <div style="overflow-x:auto"><table><thead><tr><th>Criterion</th><th>Points</th></tr></thead><tbody>${criteriaRows(POST_IMPACT)}</tbody></table></div>
+
+ <h3>Change Risk scoring (max 12)</h3>
+ <div style="overflow-x:auto"><table><thead><tr><th>Criterion</th><th>Points</th></tr></thead><tbody>${criteriaRows(POST_RISK)}</tbody></table></div>
+
+ <h3>Impact and risk bands</h3>
+ <p class="micro">Issue Impact: Low 0–11, Medium 12–23, High 24–40. Change Risk: Low 3–5, Medium 6–8, High 9–12. Governance floors can raise Issue Impact when Critical severity, Blocking customer impact, or potential Safety/Regulatory concerns would otherwise be understated.</p>
+
+ <h3>How the recommendation works</h3>
+ <p class="micro">Higher Issue Impact favors an earlier fix when Change Risk is acceptable. Higher Change Risk favors caution, deferral, or escalation. A High Impact + High Change Risk combination requires escalation because both carrying the defect and introducing the change are consequential.</p>`;
+}
+
+let helpTab='pre';
+function setHelpTab(tab){
+ helpTab=tab;
+ $('helpTabPre').className='btn'+(tab==='pre'?' primary':'');
+ $('helpTabPost').className='btn'+(tab==='post'?' primary':'');
+ $('helpBody').innerHTML=tab==='pre'?helpPreHtml():helpPostHtml();
+ $('helpBody').scrollTop=0;
+}
+function openHelp(){setHelpTab(helpTab);$('helpOverlay').classList.remove('hidden')}
+function closeHelp(){$('helpOverlay').classList.add('hidden')}
+
+function setPhase(p){
+ const isPre=p==='pre';
+ $('preSection').classList.toggle('hidden',!isPre);
+ $('preResult').classList.add('hidden');
+ $('postSection').classList.toggle('hidden',isPre);
+ $('preTab').className='btn '+(isPre?'primary':'');
+ $('postTab').className='btn '+(!isPre?'primary':'');
+ window.scrollTo({top:0,behavior:'smooth'});
+ setTimeout(()=>$(isPre?'preId':'bugId')?.focus(),100);
+}
+
+function validate(ids){
+ let ok=true,first=null;
+ ids.forEach(id=>{
+   const el=$(id); if(!el) return;
+   const val=(el.value||'').trim();
+   const f=el.closest('.field');
+   if(!val){f?.classList.add('error');ok=false;first=first||el}else f?.classList.remove('error');
+ });
+ if(first) first.focus();
+ return ok;
+}
+
+function e(s){return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+function resultHead(label,decision,bugId,rec){return `<div class="resulthead"><div class="eyebrow">${label}</div><div class="decisionline"><h2>${decision}</h2><div class="bug">${e(bugId)}</div></div><div class="rec">${rec}</div></div>`}
+
+function classifyPreImpact(){
+ const scoreMap={
+   preSeverity:{Critical:10,High:7,Medium:3,Low:1},
+   preCustomer:{Blocking:8,Significant:5,Minor:2,None:0},
+   preWorkaround:{None:6,'Partial / difficult':3,Available:0},
+   preOccurrence:{Common:5,Occasional:3,Rare:1}
+ };
+ const score=Object.entries(scoreMap).reduce((sum,[id,map])=>sum+(map[$(id).value]||0),0);
+ let band=score>=24?'High':score>=12?'Medium':'Low';
+ if(($('preSeverity').value==='Critical'||$('preCustomer').value==='Blocking')&&band==='Low')band='Medium';
+ if($('preSeverity').value==='Critical'&&$('preCustomer').value==='Blocking')band='High';
+ return {score,band};
+}
+
+function classifyPreReadiness(){
+ const root=$('preRoot').value, fix=$('preFix').value, conf=$('preConfidence').value;
+ const reg=$('preRegression').value, verify=$('preVerification').value;
+
+ if(root==='No'||fix==='No'||conf==='Low'||reg==='High'||verify==='Complex') return 'Low';
+ if(root==='Partially'||fix==='Partially'||conf==='Medium'||reg==='Medium'||verify==='Moderate') return 'Medium';
+ return 'High';
+}
+
+function classifyReleaseFit(){
+ const effort=$('preEffort').value, timeline=$('preTimeline').value, phase=$('prePhase').value;
+
+ if(timeline==='Significant'||phase.startsWith('Design Validation')) return 'Low';
+ if(timeline==='Manageable'||phase==='Dry Run'||effort==='Large') return 'Medium';
+ return 'High';
+}
+
+function isPreHighConcern(){
+ const safety=$('preSafety').value,reg=$('preRegulatory').value;
+ return ['Critical','High'].includes($('preSeverity').value)
+   ||['Blocking','Significant'].includes($('preCustomer').value)
+   ||$('preWorkaround').value==='None'
+   ||safety==='Confirmed'||safety.startsWith('Potential')
+   ||reg==='Confirmed'||reg.startsWith('Potential');
+}
+function preDecision(impact,readiness,fit){
+ if(readiness==='Low'||fit==='Low')return 'TAKE TO DHB';
+ if(readiness==='High'&&fit==='High')return 'FIX WITHIN RELEASE';
+ if((readiness==='High'&&fit==='Medium')||(readiness==='Medium'&&fit==='High')){
+   return impact==='Low'?'TAKE TO DHB':'FIX WITHIN RELEASE';
+ }
+ return 'TAKE TO DHB';
+}
+
+function evaluatePre(){
+ const ids=['preId',...PRE_IMPACT.map(x=>x.id),...PRE_FEAS.map(x=>x.id)];
+ if(!validate(ids)){alert('Please complete all required Pre-DHB fields.');return}
+
+ const {score:impactScore,band:impactBand}=classifyPreImpact();
+ const readiness=classifyPreReadiness();
+ const fit=classifyReleaseFit();
+ const decision=preDecision(impactBand,readiness,fit);
+ const highConcern=isPreHighConcern();
+ const releaseRisk=$('preTimeline').value==='Significant'||$('prePhase').value.startsWith('Design Validation')||$('preRegression').value==='High';
+ const eltCandidate=decision==='TAKE TO DHB'&&highConcern&&releaseRisk;
+
+ const impactSignals=[];
+ if(['Critical','High'].includes($('preSeverity').value))impactSignals.push(`${$('preSeverity').value.toLowerCase()} severity`);
+ if(['Blocking','Significant'].includes($('preCustomer').value))impactSignals.push(`${$('preCustomer').value.toLowerCase()} customer impact`);
+ if($('preWorkaround').value==='None')impactSignals.push('no available workaround');
+ if($('preOccurrence').value==='Common')impactSignals.push('common exposure');
+ if($('preSafety').value!=='No known concern')impactSignals.push(`${$('preSafety').value.toLowerCase()} safety concern`);
+ if($('preRegulatory').value!=='No known concern')impactSignals.push(`${$('preRegulatory').value.toLowerCase()} regulatory/compliance concern`);
+
+ const constraints=[];
+ if($('preRoot').value!=='Yes'||$('preFix').value!=='Yes')constraints.push('the root cause or fix is not fully established');
+ if(['Medium','High'].includes($('preRegression').value))constraints.push(`${$('preRegression').value.toLowerCase()} regression risk`);
+ if(['Moderate','Complex'].includes($('preVerification').value))constraints.push(`${$('preVerification').value.toLowerCase()} verification complexity`);
+ if($('preTimeline').value==='Manageable')constraints.push('manageable release timeline impact');
+ if($('preTimeline').value==='Significant')constraints.push('significant release timeline impact');
+ if($('prePhase').value==='Dry Run')constraints.push('the release is already in Dry Run');
+ if($('prePhase').value.startsWith('Design Validation'))constraints.push('the release is already in Design Validation');
+ if($('preEffort').value==='Large')constraints.push('large implementation effort');
+
+ let determinationSummary;
+ if(decision==='FIX WITHIN RELEASE'){
+   const issue=impactSignals.length?`The issue carries ${joinClauses(impactSignals)}`:`The issue has ${impactBand.toLowerCase()} overall impact`;
+   const positives=[];
+   if($('preRoot').value==='Yes'&&$('preFix').value==='Yes')positives.push('the root cause and fix are understood');
+   if($('preConfidence').value==='High')positives.push('confidence in the fix is high');
+   if($('preRegression').value==='Low')positives.push('regression risk is low');
+   if($('preVerification').value==='Simple')positives.push('verification is straightforward');
+   if($('preTimeline').value==='None')positives.push('no release timeline impact is expected');
+   determinationSummary=`${issue}. Fixing within the release is appropriate because ${positives.length?joinClauses(positives):'the fix is sufficiently ready and the release can reasonably absorb the change'}.`;
+ }else{
+   const issue=impactSignals.length?`The issue carries ${joinClauses(impactSignals)}`:`The issue has ${impactBand.toLowerCase()} overall impact`;
+   determinationSummary=`${issue}. Take the issue to DHB because ${constraints.length?joinClauses(constraints):'there is enough uncertainty or release tradeoff that routine execution is not appropriate without disposition'}.`;
+ }
+
+ const answers=Object.fromEntries([...PRE_IMPACT,...PRE_FEAS].map(x=>[x.id,{name:x.name,value:$(x.id).value}]));
+ const bugId=normId($('preId').value);
+ const existing=findBug(bugId);
+ const bug={bugId,pre:{decision,impactScore,impactBand,readiness,fit,eltCandidate,determinationSummary,answers,createdAt:new Date().toISOString()},post:existing?existing.post:null,overrides:existing?existing.overrides:[]};
+ upsertBug(bug);renderHistory();
+
+ const detailsId='preDetails-'+Date.now();
+ const answersHtml=`<button class="detail-toggle" type="button" onclick="toggleDetails('${detailsId}',this)">View assessment details</button><div id="${detailsId}" class="detail-panel hidden"><div class="answer-grid">${[...PRE_IMPACT,...PRE_FEAS].map(x=>`<div class="answer-item"><small>${e(x.name)}</small><span>${e($(x.id).value)}</span></div>`).join('')}</div></div>`;
+ const rec=decision==='FIX WITHIN RELEASE'?'Proceed through normal release execution and applicable quality controls.':'Bring the defect to DHB for disposition.';
+ const eltNote=eltCandidate?`<div class="why" style="margin-top:10px;background:var(--amberS);color:var(--amber)"><b>Potential ELT escalation</b><div style="margin-top:7px;line-height:1.6">If DHB determines this issue must be fixed, the resulting release impact may require ELT approval.</div></div>`:'';
+
+ $('preSection').classList.add('hidden');
+ $('preResult').innerHTML=resultHead('Pre-DHB assessment',decision,bugId,rec)+
+ `<div class="metrics" style="grid-template-columns:repeat(3,1fr)">
+   <div class="metric"><small>Issue Impact</small><strong>${impactBand}</strong></div>
+   <div class="metric"><small>Fix Readiness</small><strong>${readiness}</strong></div>
+   <div class="metric"><small>Release Fit</small><strong>${fit}</strong></div>
+ </div>
+ <div class="bodypad">
+   <div class="why"><b>Why this determination</b><div style="margin-top:7px;line-height:1.6">${e(determinationSummary)}</div></div>
+   ${eltNote}${answersHtml}
+   <div class="actions" style="margin-top:14px"><button class="btn primary" type="button" onclick="resetPre()">New assessment</button></div>
+ </div>`;
+ $('preResult').classList.remove('hidden');$('preResult').scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+function resetPre(){
+ ['preId',...PRE_IMPACT.map(x=>x.id),...PRE_FEAS.map(x=>x.id)].forEach(id=>{if($(id)){$(id).value='';$(id).closest('.field')?.classList.remove('error')}});
+ $('preResult').classList.add('hidden');$('preSection').classList.remove('hidden');
+}
+
+function showBugLookup(){
+ const box=$('bugLookup');if(!box)return;
+ const id=normId($('bugId').value);
+ if(!id){box.innerHTML='';return}
+ const bug=findBug(id);
+ if(!bug){box.innerHTML='<div style="background:#fff3df;border-radius:10px;padding:10px 12px">No saved Pre-DHB assessment was found in this browser for this Bug ID. You may continue only if DHB has already determined the issue can be deferred.</div>';return}
+ const parts=[];
+ if(bug.pre){
+   parts.push(`Pre-DHB assessment found — ${new Date(bug.pre.createdAt).toLocaleDateString()}: <b>${e(bug.pre.decision)}</b>`);
+   prefillPostFromPre(bug.pre);
+ }
+ if(bug.post)parts.push(`Prior Post-DHB assessment on file: <b>${e(bug.post.finalDecision||bug.post.toolDecision)}</b>${bug.overrides.length?' — overridden '+bug.overrides.length+'x':''} (${new Date(bug.post.createdAt).toLocaleDateString()})`);
+ box.innerHTML=`<div style="background:#f8f7fb;border-radius:10px;padding:10px 12px">${parts.join('<br>')}</div>`;
+}
+
+const PRE_TO_POST_MAP={
+ severity:['preSeverity'],
+ customer:['preCustomer'],
+ safety:['preSafety'],
+ regulatory:['preRegulatory'],
+ workaround:['preWorkaround'],
+ occurrence:['preOccurrence'],
+ effort:['preEffort'],
+ regression:['preRegression'],
+ timeline:['preTimeline', v=>({None:'Low',Manageable:'Medium',Significant:'High'}[v]||'')],
+ releasePhase:['prePhase']
+};
+
+function postOptionValueForLabel(postFieldId,label){
+ const cfg=POST_IMPACT.find(x=>x.id===postFieldId)||POST_RISK.find(x=>x.id===postFieldId);
+ if(!cfg)return null;
+ const match=cfg.opts.find(o=>o[0]===label);
+ return match?String(match[1]):null;
+}
+
+function prefillPostFromPre(pre){
+ if(!pre?.answers)return;
+ const map={preSeverity:'severity',preCustomer:'customer',preSafety:'safety',preRegulatory:'regulatory',preWorkaround:'workaround',preOccurrence:'occurrence',preEffort:'effort',preRegression:'regression',preTimeline:'timeline',prePhase:'releasePhase'};
+ Object.entries(map).forEach(([from,to])=>{
+   const val=pre.answers[from]?.value;if(!val||!$(to))return;
+   const sel=$(to);
+   const option=[...sel.options].find(o=>o.text===val);
+   if(option)sel.value=option.value;
+ });
+}
+
+function prefillPostFromPre(bugId){
+ const bug=findBug(bugId);
+ if(!bug||!bug.pre)return;
+ Object.entries(PRE_TO_POST_MAP).forEach(([postId,[preId,translate]])=>{
+   const preEl=$(preId);
+   if(!preEl||!preEl.value)return;
+   const rawLabel=translate?translate(preEl.value):preEl.value;
+   if(!rawLabel)return;
+   const postVal=postOptionValueForLabel(postId,rawLabel);
+   const postEl=$(postId);
+   if(postEl&&postVal!==null){
+     postEl.value=postVal;
+     postEl.closest('.field')?.classList.remove('error');
+   }
+ });
+}
+
+function txt(id){const s=$(id);return s.options[s.selectedIndex]?.text||''}
+function num(id){return $(id).value==='X'?0:Number($(id).value)}
+function issueBand(score){
+ const sev=txt('severity'),cust=txt('customer'),saf=txt('safety'),reg=txt('regulatory');
+ let band=score>=24?'High':score>=12?'Medium':'Low';
+ const rawBand=band;
+ let floorRule=null;
+ if((sev==='Critical'||cust==='Blocking'||saf.startsWith('Potential')||reg.startsWith('Potential'))&&band==='Low'){
+   band='Medium';
+   floorRule=sev==='Critical'?'Critical severity floor':cust==='Blocking'?'Blocking customer impact floor':saf.startsWith('Potential')?'Potential Safety floor':'Potential Regulatory/Compliance floor';
+ }
+ if((sev==='Critical'&&cust==='Blocking')||(saf.startsWith('Potential')&&reg.startsWith('Potential'))){
+   band='High';
+   floorRule=(sev==='Critical'&&cust==='Blocking')?'Critical severity + Blocking customer impact floor':'Potential Safety + Potential Regulatory/Compliance floor';
+ }
+ return {band,rawBand,floorRule};
+}
+function riskBand(score){return score>=9?'High':score>=6?'Medium':'Low'}
+function matrix(i,r){if(i==='High'&&r==='High')return'ESCALATE';if(i==='High')return'FIX NOW';if(i==='Medium'&&r==='Low')return'FIX NOW';if(i==='Medium')return'FIX SOON';if(i==='Low'&&r==='Low')return'FIX SOON';return'FIX LATER'}
+let current=null;
+
+function determinationSummaryPost(toolDecision,ib,rb,mandatory,floorRule){
+ if(mandatory)return 'Escalation is required because a confirmed Safety or Regulatory/Compliance impact was identified. This concern requires cross-functional governance regardless of the remaining scoring inputs.';
+ const drivers=[];
+ if(['Critical','High'].includes(txt('severity')))drivers.push(`${txt('severity').toLowerCase()} severity`);
+ if(['Blocking','Significant'].includes(txt('customer')))drivers.push(`${txt('customer').toLowerCase()} customer impact`);
+ if(txt('workaround')==='None')drivers.push('no available workaround');
+ if(txt('occurrence')==='Common')drivers.push('common exposure');
+ const risks=[];
+ if(txt('regression')==='High')risks.push('high regression risk');
+ if(txt('timeline')==='High')risks.push('high release timeline impact');
+ if(txt('releasePhase').startsWith('Design Validation'))risks.push('the release is already in Design Validation');
+ if(txt('effort')==='Large')risks.push('large implementation effort');
+
+ const impactText=drivers.length?`The issue has ${joinClauses(drivers)}`:`The overall issue impact is ${ib.toLowerCase()}`;
+ const riskText=risks.length?joinClauses(risks):`change risk is ${rb.toLowerCase()}`;
+ if(toolDecision==='FIX NOW')return `${impactText}. Fixing now is supported because ${riskText} and the balance of customer impact versus change risk favors action in the current release.`;
+ if(toolDecision==='FIX SOON')return `${impactText}. The issue warrants an earlier fix, but ${riskText}; the balance supports prioritizing it for the next appropriate release rather than forcing the change immediately.`;
+ if(toolDecision==='FIX LATER')return `${impactText}. With ${riskText}, introducing the change now is not justified by the current issue impact, so a later release is appropriate.`;
+ return `${impactText}, while ${riskText}. Because both carrying the issue and introducing the change are consequential, cross-functional escalation is recommended.`;
+}
+
+function evaluatePost(){
+ const ids=['bugId','dhbDisposition',...POST_IMPACT.map(x=>x.id),...POST_RISK.map(x=>x.id)];
+ if(!validate(ids)) return;
+ const issueScore=POST_IMPACT.reduce((s,x)=>s+num(x.id),0);
+ const riskScore=POST_RISK.reduce((s,x)=>s+num(x.id),0);
+ const {band:ib,floorRule}=issueBand(issueScore),rb=riskBand(riskScore);
+ const mandatory=$('safety').value==='X'||$('regulatory').value==='X';
+ const toolDecision=mandatory?'ESCALATE':matrix(ib,rb);
+ const reasons=[];
+ if(['Critical','High'].includes(txt('severity')))reasons.push(txt('severity')+' severity');
+ if(['Blocking','Significant'].includes(txt('customer')))reasons.push(txt('customer')+' customer impact');
+ if(txt('workaround')==='None')reasons.push('No workaround available');
+ if(txt('regression')==='High')reasons.push('High regression risk');
+ if(txt('timeline')==='High')reasons.push('High impact to release timeline');
+ if(floorRule)reasons.push(`Issue Impact band raised to ${ib} by governance floor: ${floorRule} (raw score ${issueScore} would otherwise be ${issueScore>=24?'High':issueScore>=12?'Medium':'Low'}).`);
+ if(mandatory)reasons.unshift('Confirmed Safety or Regulatory/Compliance impact requires escalation.');
+
+ const determinationSummary=determinationSummaryPost(toolDecision,ib,rb,mandatory,floorRule);
+ const answers=Object.fromEntries([...POST_IMPACT,...POST_RISK].map(x=>[x.id,{name:x.name,value:txt(x.id)}]));
+
+ const bugId=normId($('bugId').value);
+ const existing=findBug(bugId);
+ current={id:Date.now(),bugId,dhbDisposition:$('dhbDisposition').value,toolDecision,finalDecision:toolDecision,issueScore,issueBand:ib,issueFloorRule:floorRule,riskScore,riskBand:rb,reasons,determinationSummary,answers,createdAt:new Date().toISOString()};
+ const bug={bugId,pre:existing?existing.pre:null,post:current,overrides:existing?existing.overrides:[]};
+ upsertBug(bug);
+ $('postForm').classList.add('hidden');renderPost(current);renderHistory();
+}
+
+function renderPost(r){
+ const rec=r.toolDecision==='FIX NOW'?'Candidate for the current release.':r.toolDecision==='FIX SOON'?'Prioritize for the next appropriate release.':r.toolDecision==='FIX LATER'?'Plan for a future release/backlog based on prioritization.':'Cross-functional release decision required.';
+ const floorBadge=r.issueFloorRule?`<span class="pill" style="background:var(--amberS);color:var(--amber)" title="${e(r.issueFloorRule)}">Floor applied</span>`:'';
+ const bug=findBug(r.bugId);
+ const overrideCount=bug?.overrides?.length||0;
+ const overrideBtnLabel=overrideCount?'Revise POPM decision':'Record POPM decision (override)';
+
+ $('postResult').innerHTML=resultHead('Post-DHB tool recommendation',r.toolDecision,r.bugId,rec)+
+ `<div class="metrics"><div class="metric"><small>Issue Impact</small><strong>${r.issueScore}/40</strong><span class="pill">${r.issueBand}</span>${floorBadge}</div><div class="metric"><small>Change Risk</small><strong>${r.riskScore}/12</strong><span class="pill">${r.riskBand}</span></div></div>
+ <div class="bodypad">
+ ${r.determinationSummary?`<div class="why"><b>Why this recommendation</b><div style="margin-top:7px;line-height:1.6">${e(r.determinationSummary)}</div></div>`:''}
+ ${r.answers?`<button class="detail-toggle" type="button" onclick="toggleDetails('postDetails',this)">View assessment details</button><div id="postDetails" class="detail-panel hidden"><div class="answer-grid">${Object.values(r.answers).map(a=>`<div class="answer-item"><small>${e(a.name)}</small><span>${e(a.value)}</span></div>`).join('')}</div></div>`:''}
+ ${overrideCount?`<div class="micro" style="margin-top:10px">This bug has ${overrideCount} recorded POPM decision${overrideCount>1?'s':''}. See history below for the full log.</div>`:''}
+ <div class="actions" style="margin-top:14px"><button class="btn primary" type="button" onclick="resetPost()">New assessment</button><button class="btn" type="button" onclick="openOverride()">${overrideBtnLabel}</button></div>
+ </div>`;
+ $('postResult').classList.remove('hidden');$('overridePanel').classList.add('hidden');$('postResult').scrollIntoView({behavior:'smooth'});
+}
+
+const OQ=[
+['oq1','Is this issue highly visible to users?','earlier','the issue is highly visible to users'],
+['oq2','Is there a specific must-fix-by date or commitment?','earlier','there is a specific must-fix-by date or commitment'],
+['oq3','Would deferring this issue create additional user or regulatory impact?','earlier','deferring the issue would create additional user or regulatory impact'],
+['oq4','Could fixing it now introduce meaningful regression or downstream risk?','later','fixing it now could introduce meaningful regression or downstream risk'],
+['oq5','Could fixing it now impact the current release timeline?','later','fixing it now could impact the current release timeline']
+];
+
+function summarizeOverrideAnswers(answers,earlier,later){
+ const earlierClauses=OQ.filter(q=>q[2]==='earlier'&&answers[q[1]]==='Yes').map(q=>q[3]);
+ const laterClauses=OQ.filter(q=>q[2]==='later'&&answers[q[1]]==='Yes').map(q=>q[3]);
+ const parts=[];
+ if(earlierClauses.length)parts.push(`Movement to an earlier fix is supported since ${joinClauses(earlierClauses)}.`);
+ else parts.push('No factors favoring an earlier fix were identified.');
+ if(laterClauses.length)parts.push(`Caution or deferral is supported since ${joinClauses(laterClauses)}.`);
+ else parts.push('No factors favoring caution or deferral were identified.');
+ return parts.join(' ');
+}
+
+function joinClauses(list){
+ if(list.length===1)return list[0];
+ if(list.length===2)return list[0]+' and '+list[1];
+ return list.slice(0,-1).join(', ')+', and '+list[list.length-1];
+}
+
+function toggleDetails(id,btn){
+ const panel=$(id);if(!panel)return;
+ const opening=panel.classList.contains('hidden');
+ panel.classList.toggle('hidden');
+ if(btn)btn.textContent=opening?btn.textContent.replace('View ','Hide '):btn.textContent.replace('Hide ','View ');
+}
+
+function openOverride(){
+ if(!current)return;
+ const bug=findBug(current.bugId);
+ const lastOverride=bug?.overrides?.[bug.overrides.length-1];
+ $('overridePanel').innerHTML=`<h2>POPM Decision</h2><div class="sub">Post-DHB and this override step are part of POPM review. Use these five checks to support movement earlier or later than the tool recommendation. The original tool recommendation remains unchanged for traceability.</div>
+ <div class="override-summary"><div class="summarybox"><small>Tool recommendation</small><b>${current.toolDecision}</b></div><div class="summarybox"><small>Bug ID</small><b>${e(current.bugId)}</b></div></div>
+ ${lastOverride?`<div class="micro" style="margin-bottom:12px">A prior POPM decision is on file (${new Date(lastOverride.overriddenAt).toLocaleString()}): <b>${e(lastOverride.finalDecision)}</b>. Submitting below records a new POPM decision; the prior one stays in history.</div>`:''}
+ ${OQ.map(q=>`<div class="q"><label>${q[1]} <span class="req">*</span></label><select id="${q[0]}"><option value="">Select</option><option>Yes</option><option>No</option></select></div>`).join('')}
+ <div class="grid" style="margin-top:14px"><div class="field"><label>Final POPM Disposition <span class="req">*</span></label><select id="finalDisp"><option value="">Select</option><option>FIX NOW</option><option>FIX SOON</option><option>FIX LATER</option><option>ESCALATE</option></select></div><div class="field"><label>Override Rationale <span class="req">*</span></label><textarea id="overrideWhy" placeholder="Briefly document why the final POPM disposition differs from the tool recommendation."></textarea></div></div>
+
+ <div class="footerrow"><div class="micro">LOE is intentionally not part of the override questionnaire.</div><div class="actions"><button class="btn" type="button" onclick="$('overridePanel').classList.add('hidden')">Cancel</button><button class="btn primary" type="button" onclick="saveOverride()">Save POPM Decision</button></div></div>`;
+ $('overridePanel').classList.remove('hidden');$('overridePanel').scrollIntoView({behavior:'smooth'});
+}
+
+function saveOverride(){
+ const ids=[...OQ.map(x=>x[0]),'finalDisp','overrideWhy'];if(!validate(ids))return;
+ const final=$('finalDisp').value;
+ if(final===current.toolDecision){alert('The selected final disposition matches the tool recommendation. An override is not required.');return}
+ const answers=Object.fromEntries(OQ.map(q=>[q[1],$(q[0]).value]));
+ const earlier=OQ.filter(q=>q[2]==='earlier'&&$(q[0]).value==='Yes').length;
+ const later=OQ.filter(q=>q[2]==='later'&&$(q[0]).value==='Yes').length;
+ const summary=final==='ESCALATE'?'':summarizeOverrideAnswers(answers,earlier,later);
+ const overrideEntry={
+   id:Date.now(),
+   finalDecision:final,
+   answers,
+   summary,
+   rationale:$('overrideWhy').value.trim(),
+   signals:{earlier,later},
+   overriddenAt:new Date().toISOString()
+ };
+
+ const bug=findBug(current.bugId);
+ bug.overrides=[...(bug.overrides||[]),overrideEntry];
+ bug.post={...bug.post,finalDecision:final};
+ upsertBug(bug);
+ current={...current,finalDecision:final};
+ renderHistory();
+
+ const overrideDetailsId='overrideDetails-'+overrideEntry.id;
+ $('overridePanel').innerHTML=`<h2>POPM Decision Recorded</h2><div class="sub">The original tool recommendation remains unchanged for traceability.</div>
+ <div class="override-summary"><div class="summarybox"><small>Tool recommendation</small><b>${current.toolDecision}</b></div><div class="summarybox"><small>Final POPM disposition</small><b>${overrideEntry.finalDecision}</b></div></div>
+ <div class="why"><b>Override rationale</b><div style="margin-top:7px;line-height:1.6">${e(overrideEntry.rationale)}</div></div>
+ ${overrideEntry.finalDecision!=='ESCALATE'&&overrideEntry.summary?`<div class="why" style="margin-top:10px"><b>Summary of override evaluation</b><div style="margin-top:7px;line-height:1.6">${e(overrideEntry.summary)}</div></div>`:''}
+ <button class="detail-toggle" type="button" onclick="toggleDetails('${overrideDetailsId}',this)">View override details</button>
+ <div id="${overrideDetailsId}" class="detail-panel hidden"><div class="answer-grid">${OQ.map(q=>`<div class="answer-item"><small>${e(q[1])}</small><span>${e(overrideEntry.answers[q[1]])}</span></div>`).join('')}</div></div>`;
+}
+
+function chip(d){return d==='FIX NOW'?'now':d==='FIX SOON'?'soon':d==='FIX LATER'?'later':'esc'}
+
+function renderHistory(){
+ const h=getHistory().filter(b=>b.post);
+ $('hist').innerHTML=!h.length?'<div style="padding:24px;text-align:center;color:#667085">No Post-DHB assessments yet.</div>':`<table><thead><tr><th>Bug</th><th>Pre-DHB</th><th>Tool</th><th>Final POPM</th><th>Overrides</th><th>Issue Impact</th><th>Change Risk</th><th></th></tr></thead><tbody>${h.map(b=>{ const r=b.post; const overrideCount=b.overrides?.length||0; return `<tr><td><b>${e(b.bugId)}</b></td><td>${b.pre?e(b.pre.decision):'<span style="color:#98a2b3">—</span>'}</td><td><span class="chip ${chip(r.toolDecision)}">${r.toolDecision}</span></td><td><span class="chip ${chip(r.finalDecision||r.toolDecision)}">${r.finalDecision||r.toolDecision}</span></td><td>${overrideCount?overrideCount+'x':'No'}</td><td>${r.issueScore}/40 • ${r.issueBand}${r.issueFloorRule?` <span title="${e(r.issueFloorRule)}" style="color:var(--amber);font-weight:800">⚑</span>`:''}</td><td>${r.riskScore}/12 • ${r.riskBand}</td><td>${overrideCount?`<button class="btn" style="height:32px;padding:0 10px;font-size:10px" type="button" onclick="toggleOverrideLog('${e(b.bugId)}')">Log</button>`:''}</td></tr>${overrideCount?`<tr id="ovlog-${e(b.bugId)}" class="hidden"><td colspan="8"><div style="background:#f8f7fb;border-radius:12px;padding:12px 14px;margin:6px 0">${b.overrides.map((o,i)=>`<div style="padding:8px 0;${i?'border-top:1px solid var(--line)':''}"><b>#${i+1} — ${new Date(o.overriddenAt).toLocaleString()}</b> → <span class="chip ${chip(o.finalDecision)}">${o.finalDecision}</span><div style="margin-top:5px"><b>Rationale:</b> ${e(o.rationale)}</div>${o.summary?`<div style="margin-top:5px;color:#667085"><b>Summary:</b> ${e(o.summary)}</div>`:''}</div>`).join('')}</div></td></tr>`:''}`; }).join('')}</tbody></table>`;
+}
+function toggleOverrideLog(bugId){const row=$('ovlog-'+bugId);if(row)row.classList.toggle('hidden')}
+function resetPost(){
+ ['bugId','dhbDisposition',...POST_IMPACT.map(x=>x.id),...POST_RISK.map(x=>x.id)].forEach(id=>{if($(id)){$(id).value='';$(id).closest('.field')?.classList.remove('error')}});
+ $('postForm').classList.remove('hidden');$('postResult').classList.add('hidden');$('overridePanel').classList.add('hidden');current=null;
+ if($('bugLookup'))$('bugLookup').innerHTML='';
+}
+
+buildPre();
+buildPost();
+renderHistory();
+setPhase('pre');
+$('preEvaluateBtn').addEventListener('click', evaluatePre);
+[...PRE_IMPACT,...PRE_FEAS].forEach(x=>$(x.id)?.addEventListener('change',()=>$(x.id).closest('.field')?.classList.remove('error')));
+[...POST_IMPACT,...POST_RISK].forEach(x=>$(x.id)?.addEventListener('change',()=>$(x.id).closest('.field')?.classList.remove('error')));
+$('bugId')?.addEventListener('input',()=>{
+ if($('bugId').value.trim())$('bugId').closest('.field')?.classList.remove('error');
+ showBugLookup();
+});
+$('preId')?.addEventListener('input',()=>{if($('preId').value.trim())$('preId').closest('.field')?.classList.remove('error')});
+document.addEventListener('keydown',ev=>{if(ev.key==='Escape'&&!$('helpOverlay').classList.contains('hidden'))closeHelp()});
+</script>
+
+</body></html>
