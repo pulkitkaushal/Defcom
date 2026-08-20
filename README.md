@@ -2,7 +2,7 @@
 
 **Defcom** is a lightweight browser-based decision-support tool for bug disposition from **Pre-DHB triage through Post-DHB review**.
 
-Current version: **v1.2**
+Current version: **v1.5.1**
 
 ## What Defcom does
 
